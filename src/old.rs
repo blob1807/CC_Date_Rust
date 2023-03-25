@@ -59,6 +59,13 @@ fn main() {
                 Ok(a) => Some(DateTypes::Digits(a)),
                 Err(_) =>  None
             };
+    
+    let k = "Hello {}. I like {}";
+    let b = "beans";
+    let p = "pizza pie";
+
+    //let f = format!(k, b, p);
+    let f = format!("{}", k.replacen("{}", b, 1).replacen("{}", p, 1));
 }
 
 /*let date_dig: [i32;5] = [0,1,2,3,4];
@@ -100,4 +107,30 @@ let t: Vec<String> = vec![
 
     let mut g: CCDate = CCDate::from_string(&"!0 BCD 4".to_string());
 
-    println!("{:?}", g.to_decimal() + 65);*/
+    println!("{:?}", g.to_decimal() + 65);
+    let re: Regex = Regex::new(r"(?P<year>\d*) *(?P<month>[a-zA-Z]+) *(?P<day>\d*)").unwrap();
+    let reg: Regex = Regex::new(r"\d* *[a-zA-Z]+ *\d*").unwrap();
+    //let valid = "!1234 aAa 123 | !1234aAa123 \n1234 aAa 123 | 1234aAa123\n 1234 A 123 | A 123 | 1234 A \n1234A123 | A123 | 1234A \n 234123 | aAa";
+    let valid = "a";
+    /*let t = {
+        match re.captures(valid) {
+            Some(mut a) => {
+                println!("{:?}", a.get(0));
+                println!("{:?}", a.get(1));
+                println!("{:?}", a.get(2));
+                println!("{:?}", a.get(3));
+                true
+            },
+            None => false
+        }
+    };
+    println!("{:?}", t);  */
+    for i in re.captures_iter(valid) {
+        //let t = valid.chars().collect::<Vec<char>>();
+        //println!("{:?}", &t[i.start()..i.end()]);
+        println!("!{} {} {}", &i["year"], &i["month"], &i["day"]);  
+    }
+    match re.captures(valid) {
+        Some(a) => println!("!{} {} {}", &a["year"], &a["month"], &a["day"]),
+        None => print!("no match")
+    }*/

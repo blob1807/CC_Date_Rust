@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables, unused_mut, unused_imports)]
 
-use std::ops::{Add,Sub};
+use crate::until::{norm_digits, norm_string};
 
 const LETTERS_UPPER: [char;26] = [
     'A','B','C','D','E','F','G','H','I','J','K','L','M',
@@ -40,7 +40,7 @@ fn letter_match(letter: char) -> Option<i32> {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct CCDate { date: i64,}
 
 impl Default for CCDate {
@@ -50,7 +50,7 @@ impl Default for CCDate {
 }
 
 impl CCDate {
-    fn new() -> Self {
+    pub fn new() -> Self {
         CCDate::default()
     }
     pub fn from_string<'a >(date: &'a String) -> Self {
@@ -79,9 +79,13 @@ fn string_to_decimal(date: &String) -> i64 {
     digits_to_decimal(&string_to_digits(&date))
 }
 fn string_to_digits(date: &String) -> [i32;5] {
-    let date: Vec<&str> = date.strip_prefix("!").unwrap_or(date).split_whitespace().collect();
-    println!("{:?}", date);
+    let date = match norm_string(date) {
+        Some(a) => a,
+        None => panic!("Unable to normalize Date.")
+    };
+    let date: Vec<&str> = date.strip_prefix("!").unwrap().split_whitespace().collect();
     let mut work: Vec<String> = Vec::new();
+
     for i in date {work.push(i.to_string());}
 
     let mut out: [i32;5] = [
@@ -95,7 +99,6 @@ fn string_to_digits(date: &String) -> [i32;5] {
             None => 0
         };
     };
-
     out
 }
 
