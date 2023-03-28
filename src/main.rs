@@ -16,8 +16,8 @@ use cli::cli;
 
 
 fn main() {
-    // let args: Vec<String> = env::args().collect();
-    let args: Vec<String> = vec!["cc_date.exe".to_string(), "--console".to_string()];
+    let args: Vec<String> = env::args().collect();
+    // let args: Vec<String> = vec!["cc_date.exe".to_string(), "--console".to_string()];
     // let args: Vec<String> = vec!["cc_date.exe".to_string(), "--string".to_string(), "[123]".to_string()];
     // println!("{:?}", args);
 
