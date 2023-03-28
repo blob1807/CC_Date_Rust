@@ -1,7 +1,21 @@
 # Cosmic Critter Date Format Handler - Rust
 
 This is a Rust reimplementation of my orginal Python version, found here [CC Date](https://github.com/blob1807/cc_date). Made to be an executable with the addition of the Console Tool.   
-Note this isn't a 1:1 copy. 
+Note this isn't a 1:1 copy.
+
+## Terminology
+* String   - !1234 ABC 123
+* Digits   - (1234, 0, 1, 2, 123)
+* Decimal  - 21688812123
+
+## Format
+Cosmic Critters (CC) format is: `!YYYY MMM DDD`, `!0-inf A-Z*3 0-999`  
+*It's unknown what CC Dates represent. Year, Month & Day are placeholders.*
+* String is in CC format
+* Digits is the letters converted to their place in the alphabet
+* Decimal is the date converted down to Days/base10
+
+
 ```
 CLI:
     --help (-h) [Default]
