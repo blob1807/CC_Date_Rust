@@ -5,7 +5,7 @@ use crate::until::{date_eval, HELP, VALID_DECIMAL_FORMAT, VALID_DIGITS_FORMAT, V
 pub fn cli(args: &Vec<String>) -> String {
     let mode: String = args[1].to_owned();
 
-    if mode == "--help" || mode == "-h" {
+    if mode == "--help" || mode == "-h" || args.len() < 3 {
         return format!("{HELP}");
     }
     else if mode == "--math" || mode == "-m" {

@@ -173,11 +173,17 @@ pub fn console() {
             writeln!(lock, "The saved arguments are:\n{:?}", vars).unwrap()
         }
         else if args[0] == "valid" {
-                 if args[1] == "string" {writeln!(lock, "{}", VALID_STRING_FORMAT).unwrap()}
-            else if args[1] == "digits" {writeln!(lock, "{}", VALID_DIGITS_FORMAT).unwrap()}
-            else if args[1] == "decimal" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT).unwrap()}
-            else if args[1] == "all" {writeln!(lock, "{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT).unwrap()}
-            else {writeln!(lock, "Invalid type: {}", args[1]).unwrap()}
+            match args.get(1) {
+                None => writeln!(lock, "No type was provided.").unwrap(),
+                Some(a) => {
+                     if a == "string" {writeln!(lock, "{}", VALID_STRING_FORMAT).unwrap()}
+                else if a == "digits" {writeln!(lock, "{}", VALID_DIGITS_FORMAT).unwrap()}
+                else if a == "decimal" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT).unwrap()}
+                else if a == "all" {writeln!(lock, "{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT).unwrap()}
+                else {writeln!(lock, "Invalid type: {}", a).unwrap()}
+                }
+            }
+                 
         }
 
         else if args[0] == "string" {
@@ -326,7 +332,6 @@ pub fn console() {
             else {
                 writeln!(lock, "{}", CCDate::from_decimal(&vars["ans"]).to_string()).unwrap();
             }
-            
-        };
+        }
     }
 }
