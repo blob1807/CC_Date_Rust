@@ -25,7 +25,7 @@ Help:
     --math (-m) <operation: add | sub> <date:(str or array[i32;5] or i64 int)> ...
         Lets you Add & Sub any number of dates.
     
-    --valid (-v) <type: string | decimal | digits>
+    --valid (-v) <type: all | string | decimal | digits>
         Shows all the vaild formts of the given Type.
 ";
 

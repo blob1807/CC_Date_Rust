@@ -64,6 +64,7 @@ pub fn cli(args: &Vec<String>) -> String {
         if      args[2] == "string" {return format!("{}", VALID_STRING_FORMAT)}
         else if args[2] == "digits" {return format!("{}", VALID_DIGITS_FORMAT)}
         else if args[2] == "decimal" {return format!("{}", VALID_DECIMAL_FORMAT)}
+        else if args[2] == "all" {return format!("{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT)}
         else {return format!("Invalid type: {}", args[1])}
     }
     else {

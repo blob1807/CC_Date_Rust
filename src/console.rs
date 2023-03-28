@@ -20,6 +20,7 @@ const HELP: &str = "
      string  - Shows all Vaild String formats
      digits  - Shows all Vaild Digits formats
      decimal - Shows all Vaild Decimal formats
+     all     - Shows all the above type
 
  string      - Returns following value/s in string format
  digits      - Returns following value/s in digits format
@@ -172,9 +173,10 @@ pub fn console() {
             writeln!(lock, "The saved arguments are:\n{:?}", vars).unwrap()
         }
         else if args[0] == "valid" {
-            if args[1] == "string" {writeln!(lock, "{}", VALID_STRING_FORMAT).unwrap()}
+                 if args[1] == "string" {writeln!(lock, "{}", VALID_STRING_FORMAT).unwrap()}
             else if args[1] == "digits" {writeln!(lock, "{}", VALID_DIGITS_FORMAT).unwrap()}
-            else if args[1] =="decimal" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT).unwrap()}
+            else if args[1] == "decimal" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT).unwrap()}
+            else if args[1] == "all" {writeln!(lock, "{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT).unwrap()}
             else {writeln!(lock, "Invalid type: {}", args[1]).unwrap()}
         }
 
