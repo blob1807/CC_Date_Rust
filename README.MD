@@ -15,7 +15,7 @@ Cosmic Critters (CC) format is: `!YYYY MMM DDD`, `!0-inf A-Z*3 0-999`
 * Digits is the letters converted to their place in the alphabet
 * Decimal is the date converted down to Days/base10
 
-
+## Help
 ```
 CLI:
     --help (-h) [Default]
@@ -103,3 +103,11 @@ Usage:
     The saved arguments are:
     {"ans": 52736431, "d1": 52736431}
 ```
+
+## Compiling
+If you don't want to use the provided binaries or don't use Windows.  
+You can Compile the program by doing the folllowing:  
+* Download & Install Rust from https://www.rust-lang.org/tools/install  
+* Open cmd/terminal to the root dirctory `./CC_Date/`  
+* Run `cargo build --release` for standard Release Build (recommned)  
+* Run `cargo build` for standard Debug Build
