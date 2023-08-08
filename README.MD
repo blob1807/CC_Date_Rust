@@ -1,7 +1,6 @@
 # Cosmic Critter Date Format Handler - Rust
 
-This is a Rust reimplementation of my orginal Python version, found here [CC Date](https://github.com/blob1807/cc_date). Made to be an executable with the addition of the Console Tool.   
-Note this isn't a 1:1 copy.
+This is a Rust reimplementation of my orginal Python version, found here [CC Date](https://github.com/blob1807/cc_date). Made to be an executable with the addition of the Interactive (REPL) Tool.  
 
 ## Terminology
 * String   - !1234 ABC 123
@@ -20,8 +19,8 @@ Cosmic Critters (CC) format is: `!YYYY MMM DDD`, `!0-inf A-Z*3 0-999`
 CLI:
     --help (-h) [Default]
         Shows this.
-    --console (-c)
-        Lanches the Console Tool.
+    --repl (-r)
+        Lanches an Interactive Tool.
 
     --string  (-s)  <date:(str or array[i32;5] or i64 int)>
         Converts a given date into String format.
@@ -30,17 +29,17 @@ CLI:
     --digits  (-di) <date:(str or array[i32;5] or i64 int)>
         Converts a given date into Digits format.
 
-    --math (-m) <operation: add | sub> <date:(str or array[i32;5] or i64 int)> ...
+    --math (-m) <operation: add (+) | sub (-)> <date:(str or array[i32;5] or i64 int)> ...
         Lets you Add & Sub any number of dates.
 
     --valid (-v) <type: all | string | decimal | digits>
         Shows all the vaild formts of the given Type.
 
-Console Tool:
+Interactive (REPL) Tool:
     help        - Shows this help
     usage       - Shows Tool usage examples
     quit/exit   - Closes Tool
-    clear/cls   - Clears ANS
+    clear/cls   - Clears Screen
     var/vars    - Shows all created Variables
     valid       
         string  - Shows all Vaild String formats
@@ -107,7 +106,8 @@ Usage:
 ## Compiling
 If you don't want to use the provided binaries or don't use Windows.  
 You can Compile the program by doing the folllowing:  
-* Download & Install Rust from https://www.rust-lang.org/tools/install  
-* Open cmd/terminal to the root dirctory `./CC_Date/`  
+* Download & Install Rust from the instrution here https://www.rust-lang.org/tools/install  
+* Open cmd/terminal to the root dirctory `./CC_Date_Rust/`  
 * Run `cargo build --release` for standard Release Build (recommned)  
 * Run `cargo build` for standard Debug Build
+* Your exe can now be found in `./CC_Date_Rust/target/[build type]`

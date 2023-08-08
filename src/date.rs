@@ -1,7 +1,5 @@
-#![allow(dead_code)]
-#![allow(unused_variables, unused_mut, unused_imports)]
 
-use crate::until::{norm_digits, norm_string};
+use crate::util::{norm_digits, norm_string};
 
 const LETTERS_UPPER: [char;26] = [
     'A','B','C','D','E','F','G','H','I','J','K','L','M',
@@ -41,26 +39,23 @@ fn letter_match(letter: char) -> Option<i32> {
 
 
 #[derive(Debug, Clone, Copy)]
-pub struct CCDate { date: i64,}
-
-impl Default for CCDate {
-    fn default() -> Self {
-        CCDate { date: 0 }
-    }
-}
+pub struct CCDate { date: i64 }
 
 impl CCDate {
-    pub fn new() -> Self {
-        CCDate::default()
-    }
     pub fn from_string<'a >(date: &'a String) -> Self {
-        CCDate { date: string_to_decimal(&date) }
+        match norm_string(date) {
+            Some(a) => CCDate { date: string_to_decimal(&a) },
+            None => panic!("Unable to normalize Date.")
+        }
     }
     pub fn from_decimal<'a >(date: &'a i64) -> Self {
         CCDate { date: date.to_owned() }
     }
     pub fn from_digits<'a >(date: &'a [i32;5]) -> Self {
-        CCDate { date: digits_to_decimal(&date) }
+        match norm_digits(&date.to_vec()) {
+            Ok(a) => CCDate { date: digits_to_decimal(&a) },
+            Err(e) => panic!("{}", e)
+        }
     }
 
     pub fn to_string(&self) -> String {
@@ -75,36 +70,34 @@ impl CCDate {
 
 }
 
+
 fn string_to_decimal(date: &String) -> i64 {
     digits_to_decimal(&string_to_digits(&date))
 }
 fn string_to_digits(date: &String) -> [i32;5] {
-    let date = match norm_string(date) {
-        Some(a) => a,
-        None => panic!("Unable to normalize Date.")
-    };
     let date: Vec<&str> = date.strip_prefix("!").unwrap().split_whitespace().collect();
     let mut work: Vec<String> = Vec::new();
 
-    for i in date {work.push(i.to_string());}
+    for i in date {work.push(i.to_string())}
 
-    let mut out: [i32;5] = [
-        work[0].parse().unwrap_or(0),
-        0, 0, 0,
-        work[2].parse().unwrap_or(0)];
-
-    for (pos, letter) in work[1].to_uppercase().chars().enumerate() {
-        out[1+pos] = match letter_match(letter) {
-            Some(a) => a,
-            None => 0
-        };
+    let mut out: Vec<i32> = vec!(work[0].parse().unwrap_or(0));
+    
+    for letter in work[1].to_uppercase().chars() {
+        out.push( match letter_match(letter) {
+                Some(a) => a,
+                None => 0
+            }
+        )
     };
-    out
+    out.push(work[2].parse().unwrap_or(0));
+    norm_digits(&out).unwrap()
 }
+
 
 fn decimal_to_string(date: &i64) -> String {
     digits_to_string(&decimal_to_digits(&date))
 }
+
 fn decimal_to_digits(date: &i64) -> [i32;5] {
     let mut date: i64 = date.to_owned();
     let mut out: [i32;5] = [0;5];
@@ -118,6 +111,7 @@ fn decimal_to_digits(date: &i64) -> [i32;5] {
     out
 }
 
+
 fn digits_to_string(date: &[i32;5]) -> String {
     format!(
         "!{} {}{}{} {}",
@@ -128,6 +122,7 @@ fn digits_to_string(date: &[i32;5]) -> String {
             date[4]
         )
 }
+
 fn digits_to_decimal(date: &[i32;5]) -> i64 {
     let mut out: i64 = 0;
     for (w, n) in [17576000, 676000, 26000, 1000, 1].iter().zip(date.to_owned()) {

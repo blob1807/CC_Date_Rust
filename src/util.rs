@@ -1,33 +1,9 @@
 
-#![allow(dead_code)]
-#![allow(unused_variables, unused_mut, unused_imports)]
-
 use lazy_static::lazy_static;
 use regex::Regex;
 
-
 use crate::date::CCDate;
 
-pub const HELP: &str = "
-Help:
-    --help (-h) [Default]
-        Shows this.
-    --console (-c)
-        Lanches the Console Tool.
-    
-    --string  (-s)  <date:(str or array[i32;5] or i64 int)>
-        Converts a given date into String format.
-    --decimal (-de) <date:(str or array[i32;5] or i64 int)>
-        Converts a given date into Decimal format.
-    --digits  (-di) <date:(str or array[i32;5] or i64 int)>
-        Converts a given date into Digits format.
-
-    --math (-m) <operation: add | sub> <date:(str or array[i32;5] or i64 int)> ...
-        Lets you Add & Sub any number of dates.
-    
-    --valid (-v) <type: all | string | decimal | digits>
-        Shows all the vaild formts of the given Type.
-";
 
 pub const VALID_STRING_FORMAT: &str = "
 !1234 aAa 123 | !1234aAa123 
@@ -66,7 +42,7 @@ pub fn date_eval(date_: &String) -> Result<CCDate, String> {
                 temp.push(t);
             };
             match norm_digits(&temp) {
-                Ok(a) => Ok(CCDate::from_digits(&a)),
+                Ok(a) => Ok(CCDate::from_digits(&a.try_into().unwrap())),
                 Err(_) => Err(format!("Unable to parse date {}.", date_))
             }
     }
@@ -83,7 +59,6 @@ pub fn date_eval(date_: &String) -> Result<CCDate, String> {
     }
 }
 
-
 pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], String> {
     let mut date_: Vec<i32> = date_.to_owned();
     if date_.len() < 5 {
@@ -95,11 +70,12 @@ pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], String> {
         let base26: Vec<char> = "0123456789abcdefghijklmnop".chars().collect();
         let h: i32 = {
             let mut out: String = String::new();
-            for (pos, c) in date_[1..date_.len()-4].iter().enumerate(){
-                if *c > 25 {
-                    return Err(format!("Num {} at pos {} is bigger than 25", c, pos));
-                }
-                else { out.push(base26[*c as usize]); }
+            for n in (1..date_.len()-4).rev() {
+                date_[n-1] += date_[n]/26;
+                date_[n] = date_[n]%26;        
+            }
+            for n in date_[1..date_.len()-4].iter() {
+                out.push(base26[*n as usize]);
             }
             out.push('0');
             match i32::from_str_radix(out.as_str(), 26) {

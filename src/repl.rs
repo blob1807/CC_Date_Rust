@@ -1,20 +1,16 @@
 
-#![allow(dead_code)]
-#![allow(unused_variables, unused_mut, unused_imports)]
-
 use std::collections::HashMap;
-use std::env::{self, var};
 use std::io::{self, Write, stdin, stdout};
 
 use crate::date::CCDate;
-use crate::until::{date_eval, VALID_DECIMAL_FORMAT, VALID_DIGITS_FORMAT, VALID_STRING_FORMAT};
+use crate::util::{date_eval, VALID_DECIMAL_FORMAT, VALID_DIGITS_FORMAT, VALID_STRING_FORMAT};
 
 
 const HELP: &str = "
  help        - Shows this help
  usage       - Shows Tool usage examples
  quit/exit   - Closes Tool
- clear/cls   - Clears ANS
+ clear/cls   - Clears Screen
  var/vars    - Shows all created Variables
  valid       
      string  - Shows all Vaild String formats
@@ -84,7 +80,7 @@ fn get_date (vars: &HashMap<String, i64>, arg: &String) -> Option<CCDate> {
         Some(a) => Some(CCDate::from_decimal(a)),
         None => match date_eval(arg) {
             Ok(a) => Some(a),
-            Err(e) => None
+            Err(_) => None
         }
     }
 }
@@ -97,7 +93,7 @@ fn get_date_as_num (vars: &HashMap<String, i64>, arg: &String, lock: &mut io::St
 }
 
 
-pub fn console() {
+pub fn repl() {
     let mut lock: io::StdoutLock = stdout().lock();
     let mut vars: HashMap<String, i64> = HashMap::new(); //HashMap<String, String> -> HashMap<String, enum<String, i64, CC_Date>>
     vars.insert("ans".to_string(), 0);
@@ -183,7 +179,6 @@ pub fn console() {
                 else {writeln!(lock, "Invalid type: {}", a).unwrap()}
                 }
             }
-                 
         }
 
         else if args[0] == "string" {
@@ -332,6 +327,7 @@ pub fn console() {
             else {
                 writeln!(lock, "{}", CCDate::from_decimal(&vars["ans"]).to_string()).unwrap();
             }
-        }
+        };
+        writeln!(lock, "").unwrap();
     }
 }
