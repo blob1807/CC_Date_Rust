@@ -1,2 +1,4 @@
 /target
 /.*
+src/old.rs
+/.vscode
