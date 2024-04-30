@@ -7,11 +7,12 @@ mod cli;
 
 use repl::repl;
 use cli::{cli, HELP};
+use std::io::Result;
 
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    // let args: Vec<String> = vec!["cc_date.exe".to_string(), "--repl".to_string()];
+fn main() -> Result<()> {
+    //let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = vec!["cc_date.exe".to_string(), "--repl".to_string()];
     // let args: Vec<String> = vec!["cc_date.exe".to_string(), "--string".to_string(), "[123]".to_string()];
     // println!("{:?}", args);
 
@@ -20,10 +21,11 @@ fn main() {
         1 => println!("{HELP}"),
         _ => {
             if args[1] == "--repl" || args[1] == "-r" { 
-                repl() 
+                repl()? 
             } else { 
                 println!("{}", cli(&args))
             }
         }
     };
+    Ok(())
 }

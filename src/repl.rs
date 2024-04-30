@@ -1,6 +1,6 @@
 
 use std::collections::HashMap;
-use std::io::{self, Write, stdin, stdout};
+use std::io::{self, Write, stdin, stdout, Result};
 
 use crate::date::CCDate;
 use crate::util::{date_eval, VALID_DECIMAL_FORMAT, VALID_DIGITS_FORMAT, VALID_STRING_FORMAT};
@@ -13,14 +13,15 @@ const HELP: &str = "
  clear/cls   - Clears Screen
  var/vars    - Shows all created Variables
  valid       
-     string  - Shows all Vaild String formats
-     digits  - Shows all Vaild Digits formats
-     decimal - Shows all Vaild Decimal formats
-     all     - Shows all the above type
+     string/str  - Shows all Vaild String formats
+     digits/dig  - Shows all Vaild Digits formats
+     decimal/dec - Shows all Vaild Decimal formats
+     all         - Shows all the above type
 
- string      - Returns following value/s in string format
- digits      - Returns following value/s in digits format
- decimal     - Returns following value/s in decimal format
+ string/str      - Returns following value/s in string format
+ digits/dig      - Returns following value/s in digits format
+ decimal/dec     - Returns following value/s in decimal format
+
  add         - Adds all following values
  sub         - Subs all following values
 
@@ -93,22 +94,22 @@ fn get_date_as_num (vars: &HashMap<String, i64>, arg: &String, lock: &mut io::St
 }
 
 
-pub fn repl() {
+pub fn repl() -> Result<()> {
     let mut lock: io::StdoutLock = stdout().lock();
-    let mut vars: HashMap<String, i64> = HashMap::new(); //HashMap<String, String> -> HashMap<String, enum<String, i64, CC_Date>>
+    let mut vars: HashMap<String, i64> = HashMap::new();
     vars.insert("ans".to_string(), 0);
 
     let ops: &str = "+-=";
     let str_conts: &str = "'\"";
-    writeln!(lock, "Welcome to the Cosmic Critters Date Console Tool.\nType help or usage for how to use it.\n").unwrap();
+    writeln!(lock, "Welcome to the Cosmic Critters Date REPL Tool.\nType 'help' or 'usage' for how to use it.\n")?;
 
-    loop {
+    'repl: loop {
         let mut input: String = String::new();
 
-        write!(lock, "cc_date> ").unwrap();
-        // write!(lock, "cc-date> ").unwrap();
-        lock.flush().unwrap();
-        stdin().read_line(&mut input).unwrap();
+        write!(lock, "cc_date> ")?;
+        // write!(lock, "cc-date> ")?;
+        lock.flush()?;
+        stdin().read_line(&mut input)?;
 
         if input.trim().is_empty() {
             continue;
@@ -117,23 +118,20 @@ pub fn repl() {
         let mut args: Vec<String> = Vec::new();
         let mut constructor: String = String::new();
         let mut is_string: bool = false;
-        let mut early_exit: bool = false;
 
         for c in input.trim().chars() {
             if str_conts.contains(c) {
-                is_string = !is_string;
+                is_string = true;
                 constructor.push(c);
             }
             else if ops.contains(c) {
                 if is_string {
-                    writeln!(lock, "Operator '{}' was found in a String Date starting with '{}'", c, constructor).unwrap();
-                    early_exit = true;
-                    break;
+                    writeln!(lock, "Operator '{}' was found in a String Date starting with '{}'", c, constructor)?;
+                    continue 'repl;
                 }
                 else if c == '=' && args.len() > 2 {
-                    writeln!(lock, "Operator '=' should be the 1st or 2nd argument").unwrap();
-                    early_exit = true;
-                    break;
+                    writeln!(lock, "Operator '=' should be the 1st or 2nd argument")?;
+                    continue 'repl;
                 }
                 else if !constructor.is_empty() {
                     args.push(constructor.clone());
@@ -151,37 +149,37 @@ pub fn repl() {
                 constructor.push(c);
             };
         };
+
         if !constructor.is_empty() { args.push(constructor.clone()); };
-        if early_exit { continue; };
-        // println!("{:?}", input);
-        // println!("{:?}", args);
+        //println!("{:?}", input);
+        //println!("{:?}", args);
 
         if args[0] == "help" {
-            writeln!(lock, "{}", HELP).unwrap();
+            writeln!(lock, "{}", HELP)?;
         }
         else if args[0] == "usage" {
-            writeln!(lock, "{}", USAGE).unwrap();
+            writeln!(lock, "{}", USAGE)?;
         }
         else if args[0] == "quit" || args[0] == "exit" {
-            break
+            break 'repl
         }
         else if args[0] == "var" || args[0] == "vars"{
-            writeln!(lock, "The saved arguments are:\n{:?}", vars).unwrap()
+            writeln!(lock, "The saved arguments are:\n{:?}", vars)?
         }
         else if args[0] == "valid" {
             match args.get(1) {
-                None => writeln!(lock, "No type was provided.").unwrap(),
+                None => writeln!(lock, "No type was provided.")?,
                 Some(a) => {
-                     if a == "string" {writeln!(lock, "{}", VALID_STRING_FORMAT).unwrap()}
-                else if a == "digits" {writeln!(lock, "{}", VALID_DIGITS_FORMAT).unwrap()}
-                else if a == "decimal" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT).unwrap()}
-                else if a == "all" {writeln!(lock, "{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT).unwrap()}
-                else {writeln!(lock, "Invalid type: {}", a).unwrap()}
+                     if a=="string"  || a=="str" {writeln!(lock, "{}", VALID_STRING_FORMAT)?}
+                else if a=="digits"  || a=="dig" {writeln!(lock, "{}", VALID_DIGITS_FORMAT)?}
+                else if a=="decimal" || a=="dec" {writeln!(lock, "{}", VALID_DECIMAL_FORMAT)?}
+                else if a=="all" {writeln!(lock, "{}\n{}\n{}", VALID_STRING_FORMAT, VALID_DIGITS_FORMAT, VALID_DECIMAL_FORMAT)?}
+                else {writeln!(lock, "Invalid type: {}", a)?}
                 }
             }
         }
 
-        else if args[0] == "string" {
+        else if args[0] == "string" || args[0] == "str"{
             for d in args[1..].iter() {
                 let out: String = {
                     match get_date(&vars, &d) {
@@ -192,10 +190,10 @@ pub fn repl() {
                         None => format!("{} -> Unable to convert", d)
                     }
                 };
-                writeln!(lock, "{}", out).unwrap()
+                writeln!(lock, "{}", out)?
             }
         }
-        else if args[0] == "digits" {
+        else if args[0] == "digits" || args[0] == "dig"{
             for d in args[1..].iter() {
                 let out: String = {
                     match get_date(&vars, &d) {
@@ -206,11 +204,11 @@ pub fn repl() {
                         None => format!("{} -> Unable to convert", d)
                     }
                 };
-                writeln!(lock, "{}", out).unwrap()
+                writeln!(lock, "{}", out)?
             }
             
         }
-        else if args[0] == "decimal" {
+        else if args[0] == "decimal" || args[0] == "dec"{
             for d in args[1..].iter() {
                 let out: String = {
                     match get_date(&vars, &d) {
@@ -221,7 +219,7 @@ pub fn repl() {
                         None => format!("{} -> Unable to convert", d)
                     }
                 };
-                writeln!(lock, "{}", out).unwrap()
+                writeln!(lock, "{}", out)?
             }
             
         }
@@ -231,13 +229,13 @@ pub fn repl() {
                 let work = {
                     match get_date(&vars, &d) {
                         Some(a) => a.to_decimal(),
-                        None => {writeln!(lock, "Unable to add. Invalid date '{}'", d).unwrap(); 0}
+                        None => {writeln!(lock, "Unable to add. Invalid date '{}'", d)?; 0}
                     }
                 };
                 out += work;
             }
             vars.insert("ans".to_string(), out);
-            writeln!(lock, "{}", CCDate::from_decimal(&out).to_string()).unwrap();
+            writeln!(lock, "{}", CCDate::from_decimal(&out).to_string())?;
             
         }
         else if args[0] == "sub" {
@@ -246,26 +244,26 @@ pub fn repl() {
                 let work = {
                     match get_date(&vars, &d) {
                         Some(a) => a.to_decimal(),
-                        None => {writeln!(lock, "Unable to add. Invalid date '{}'", d).unwrap(); 0}
+                        None => {writeln!(lock, "Unable to add. Invalid date '{}'", d)?; 0}
                     }
                 };
                 out -= work;
             }
             vars.insert("ans".to_string(), out);
             if out < 0 {
-                writeln!(lock, "Negive numbers aren't supported as a valid Date rn.\n{}", out).unwrap();
+                writeln!(lock, "Negive numbers aren't supported as a valid Date rn.\n{}", out)?;
             }
             else {
-                writeln!(lock, "{}", CCDate::from_decimal(&out).to_string()).unwrap();
+                writeln!(lock, "{}", CCDate::from_decimal(&out).to_string())?;
             }
         }
         else if args.len() == 1 {
             match get_date(&vars, &args[0]) {
                 Some(a) => {
                     vars.insert("ans".to_string(), a.to_decimal());
-                    writeln!(lock, "{}", a.to_string()).unwrap()
+                    writeln!(lock, "{}", a.to_string())?
                 },
-                None => writeln!(lock, "Couldn't parse {} as a valid date.", args[0]).unwrap()
+                None => writeln!(lock, "Couldn't parse {} as a valid date.", args[0])?
             }
         }
         else {
@@ -278,10 +276,10 @@ pub fn repl() {
                 else if args[1] == "=" {
                     match &args[0].parse::<usize>() {
                         Ok(_) => {
-                            write!(lock, "WARNING: Are you sure you want to set '{}' as a Variable N|y? ", args[0]).unwrap();
-                            lock.flush().unwrap();
+                            write!(lock, "WARNING: Are you sure you want to set '{}' as a Variable N|y? ", args[0])?;
+                            lock.flush()?;
                             let mut or_check = String::new();
-                            stdin().read_line(&mut or_check).unwrap();
+                            stdin().read_line(&mut or_check)?;
                             if "yes".contains(&or_check.to_lowercase().trim()) { true }
                             else { continue; }
                         },
@@ -304,30 +302,31 @@ pub fn repl() {
                 if args[pos] == "+" {
                     let d: i64 = vars[&store] + get_date_as_num(&vars, &args[pos+1], &mut lock);
                     vars.insert(store.to_owned(), d);
-                    // writeln!(lock, "{}", vars[&store]).unwrap();
+                    // writeln!(lock, "{}", vars[&store])?;
                     pos += 2
                     
                 }
                 else if args[pos] == "-" {
                     let d: i64 = vars[&store] - get_date_as_num(&vars, &args[pos+1], &mut lock);
                     vars.insert(store.to_owned(), d);
-                    // writeln!(lock, "{}", vars[&store]).unwrap();
+                    // writeln!(lock, "{}", vars[&store])?;
                     pos += 2
 
                 }
                 else {
-                    writeln!(lock, "Invaild argument: {:?}", args[pos]).unwrap();
+                    writeln!(lock, "Invaild argument: {:?}", args[pos])?;
                     pos += 1;
                 };
             };
             vars.insert("ans".to_string(), vars[&store]);
             if vars["ans"] < 0 {
-                writeln!(lock, "Negive numbers aren't supported as a valid Date rn.\n{}", vars["ans"]).unwrap();
+                writeln!(lock, "Negive numbers aren't supported as a valid Date rn.\n{}", vars["ans"])?;
             }
             else {
-                writeln!(lock, "{}", CCDate::from_decimal(&vars["ans"]).to_string()).unwrap();
+                writeln!(lock, "{}", CCDate::from_decimal(&vars["ans"]).to_string())?;
             }
         };
-        writeln!(lock, "").unwrap();
+        writeln!(lock, "")?;
     }
+    Ok(())
 }

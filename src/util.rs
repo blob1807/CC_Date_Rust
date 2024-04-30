@@ -1,4 +1,6 @@
 
+use std::num::ParseIntError;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -59,7 +61,7 @@ pub fn date_eval(date_: &String) -> Result<CCDate, String> {
     }
 }
 
-pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], String> {
+pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], ParseIntError> {
     let mut date_: Vec<i32> = date_.to_owned();
     if date_.len() < 5 {
         date_.reverse();
@@ -67,6 +69,12 @@ pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], String> {
         date_.reverse();
     }
     if date_.len() > 5 {
+        /*
+        [1, 32, 2, 3, 4, 5, 6] -> [2, 6, 2, 3, 4, 5, 6]
+        [2, 6, 2, 3, 4, 5, 6] -> [2, 623, 4, 5, 6] -> [2, 3, 4, 5, 6], 620
+        base26 -> base10: 620 -> 4108
+        [2+4108, 3, 4, 5, 6] -> [4110, 3, 4, 5, 6]
+        */
         let base26: Vec<char> = "0123456789abcdefghijklmnop".chars().collect();
         let h: i32 = {
             let mut out: String = String::new();
@@ -78,10 +86,7 @@ pub fn norm_digits(date_: &Vec<i32>) ->  Result<[i32;5], String> {
                 out.push(base26[*n as usize]);
             }
             out.push('0');
-            match i32::from_str_radix(out.as_str(), 26) {
-                Ok(a) => a,
-                Err(e) => return Err(e.to_string())
-            }
+            i32::from_str_radix(out.as_str(), 26)?
         };
         date_[0] = date_[0] + h;
         date_.drain(1..date_.len()-4);
